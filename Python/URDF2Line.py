@@ -1,6 +1,5 @@
 import numpy as np
-
-# Compatibility for NumPy >=2.0 removals used by dependencies.
+# Compatibility for NumPy >=2.0 where ndarray.ptp was removed.
 if not hasattr(np.ndarray, "ptp"):
     def _ndarray_ptp(self, *args, **kwargs):
         return np.ptp(self, *args, **kwargs)
@@ -13,6 +12,7 @@ if not hasattr(np, "float"):
         np.float = float
     except (TypeError, AttributeError):
         pass
+
 
 from urdfpy import URDF 
 #   Author: Minchang Sung

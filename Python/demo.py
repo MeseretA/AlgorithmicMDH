@@ -12,12 +12,14 @@ from PbSim import PbSim
 import numpy as np
 
 # you can change urdf_name
-urdf_name = "urdf/indy7/indy7.urdf"
+# urdf_name = "urdf/indy7/indy7.urdf"
 #urdf_name = "urdf/kuka_iiwa/kuka_iiwa.urdf"
 #urdf_name = "urdf/ur5/ur5.urdf"
 #urdf_name = "urdf/kuka_lwr/kuka.urdf"
 #urdf_name = "urdf/softrobot_urdf/softarm_urdf(p)_test.urdf"
 #urdf_name ="urdf/scara/scara.urdf"
+# urdf_name ="urdf/posco_dual/mmr_steel_torso_frame_fixer.urdf"
+urdf_name ="urdf/qdd_va_dual/SF-Simple_Assy_SLDASM_meshes.urdf"
 urdf=URDF2Line(urdf_name)
 
 ADH = AlgorithmicMDH(urdf.z_list,urdf.p_list,urdf.z_tcf,urdf.p_tcf,urdf.x_tcf,urdf.x_0)

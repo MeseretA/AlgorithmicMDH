@@ -37,6 +37,8 @@ class URDF2Line:
         robot = URDF.load(urdf_path)
         self.robot =robot
         base_link = getJoint(robot,robot.actuated_joints[0].parent)
+        # Keep the exact base link used by the mDH extraction pipeline.
+        self.base_link_name = base_link.name
         T_0 = robot.link_fk()[base_link]
         R_0,p_0 = TransToRp(T_0)
         self.p_0 = p_0

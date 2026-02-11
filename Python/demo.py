@@ -31,7 +31,7 @@ print(ADH.MDH)
 joint_type_map = {"revolute": 0, "prismatic": 1}
 joint_types = [joint_type_map.get(j.joint_type, 0) for j in urdf.robot.actuated_joints]
 mdh_frames = get_T_base_mdh_frame(ADH.MDH, joint_types, T_base_mdh0=np.eye(4))
-base_link_name = urdf.robot.actuated_joints[0].parent
+base_link_name = urdf.base_link_name
 
 dynamics = extract_dynamics_in_mdh_frames(
     urdf_path=urdf_name,
@@ -43,6 +43,7 @@ csv_path = "dynamics_in_mdh_frames.csv"
 save_dynamics_to_csv(dynamics, csv_path)
 print("=================DYNAMICS IN MDH FRAMES================")
 print(f"CSV saved: {csv_path}")
+print(f"Base frame for dynamics (same as mDH extraction): {base_link_name}")
 if len(dynamics) == 0:
     print("No <inertial> elements were found for actuated child links.")
 else:

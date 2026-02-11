@@ -36,7 +36,17 @@ class DynamicsMdhTests(unittest.TestCase):
             "link1": {
                 "joint_name": "joint0",
                 "joint_index": 0,
+                "base_frame_name": "base_link",
                 "mass": 2.0,
+                "com_base": np.array([1.1, 1.2, 1.3], dtype=float),
+                "inertia_base_about_com": np.array(
+                    [
+                        [4.0, 0.4, 0.5],
+                        [0.4, 5.0, 0.6],
+                        [0.5, 0.6, 6.0],
+                    ],
+                    dtype=float,
+                ),
                 "com": np.array([0.1, 0.2, 0.3], dtype=float),
                 "inertia": np.array(
                     [
@@ -72,8 +82,11 @@ class DynamicsMdhTests(unittest.TestCase):
             self.assertEqual(len(rows), 1)
             self.assertEqual(rows[0]["link_name"], "link1")
             self.assertEqual(rows[0]["joint_name"], "joint0")
+            self.assertEqual(rows[0]["base_frame_name"], "base_link")
             self.assertEqual(rows[0]["inertia_about"], "com")
             self.assertAlmostEqual(float(rows[0]["mass"]), 2.0)
+            self.assertAlmostEqual(float(rows[0]["com_base_x"]), 1.1)
+            self.assertAlmostEqual(float(rows[0]["I_base_zz"]), 6.0)
             self.assertAlmostEqual(float(rows[0]["com_x"]), 0.1)
             self.assertAlmostEqual(float(rows[0]["I_zz"]), 3.0)
 

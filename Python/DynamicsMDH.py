@@ -389,6 +389,8 @@ def transform_inertial_to_mdh(
         I_J, _ = _symmetrize_inertia(I_J)
 
     return {
+        "r_base_com": p_bC,
+        "I_base_about_com": I_b_C,
         "r_J_com": r_J_com,
         "I_J": I_J,
         "I_J_about_com": I_J_C,
@@ -448,7 +450,10 @@ def extract_dynamics_in_mdh_frames(
         results[link_name] = {
             "joint_name": joint.name,
             "joint_index": joint_index,
+            "base_frame_name": base_link_name,
             "mass": inertial.mass,
+            "com_base": transformed["r_base_com"],
+            "inertia_base_about_com": transformed["I_base_about_com"],
             "com": transformed["r_J_com"],
             "inertia": transformed["I_J"],
             "inertia_about": inertia_about,
@@ -474,8 +479,21 @@ def save_dynamics_to_csv(results: Mapping[str, Mapping[str, Any]], csv_path: str
         "link_name",
         "joint_name",
         "joint_index",
+        "base_frame_name",
         "mass",
         "inertia_about",
+        "com_base_x",
+        "com_base_y",
+        "com_base_z",
+        "I_base_xx",
+        "I_base_xy",
+        "I_base_xz",
+        "I_base_yx",
+        "I_base_yy",
+        "I_base_yz",
+        "I_base_zx",
+        "I_base_zy",
+        "I_base_zz",
         "com_x",
         "com_y",
         "com_z",
@@ -509,6 +527,8 @@ def save_dynamics_to_csv(results: Mapping[str, Mapping[str, Any]], csv_path: str
         writer = csv.DictWriter(fp, fieldnames=fieldnames)
         writer.writeheader()
         for link_name, vals in results.items():
+            com_base = np.asarray(vals.get("com_base", np.zeros(3)), dtype=float).reshape(3)
+            inertia_base = np.asarray(vals.get("inertia_base_about_com", np.zeros((3, 3))), dtype=float).reshape(3, 3)
             com = np.asarray(vals["com"], dtype=float).reshape(3)
             inertia = np.asarray(vals["inertia"], dtype=float).reshape(3, 3)
             raw = vals.get("raw_urdf", {})
@@ -521,8 +541,21 @@ def save_dynamics_to_csv(results: Mapping[str, Mapping[str, Any]], csv_path: str
                     "link_name": link_name,
                     "joint_name": vals.get("joint_name", ""),
                     "joint_index": vals.get("joint_index", ""),
+                    "base_frame_name": vals.get("base_frame_name", ""),
                     "mass": float(vals.get("mass", 0.0)),
                     "inertia_about": vals.get("inertia_about", ""),
+                    "com_base_x": com_base[0],
+                    "com_base_y": com_base[1],
+                    "com_base_z": com_base[2],
+                    "I_base_xx": inertia_base[0, 0],
+                    "I_base_xy": inertia_base[0, 1],
+                    "I_base_xz": inertia_base[0, 2],
+                    "I_base_yx": inertia_base[1, 0],
+                    "I_base_yy": inertia_base[1, 1],
+                    "I_base_yz": inertia_base[1, 2],
+                    "I_base_zx": inertia_base[2, 0],
+                    "I_base_zy": inertia_base[2, 1],
+                    "I_base_zz": inertia_base[2, 2],
                     "com_x": com[0],
                     "com_y": com[1],
                     "com_z": com[2],

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 from dataclasses import dataclass
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple, Union
 import xml.etree.ElementTree as ET
@@ -461,6 +462,96 @@ def extract_dynamics_in_mdh_frames(
         }
 
     return results
+
+
+def save_dynamics_to_csv(results: Mapping[str, Mapping[str, Any]], csv_path: str) -> None:
+    """Save transformed dynamic parameters to CSV.
+
+    Columns include mass, CoM in mDH frame, inertia in mDH frame, and raw URDF inertial values.
+    """
+
+    fieldnames = [
+        "link_name",
+        "joint_name",
+        "joint_index",
+        "mass",
+        "inertia_about",
+        "com_x",
+        "com_y",
+        "com_z",
+        "I_xx",
+        "I_xy",
+        "I_xz",
+        "I_yx",
+        "I_yy",
+        "I_yz",
+        "I_zx",
+        "I_zy",
+        "I_zz",
+        "raw_xyz_x",
+        "raw_xyz_y",
+        "raw_xyz_z",
+        "raw_rpy_roll",
+        "raw_rpy_pitch",
+        "raw_rpy_yaw",
+        "raw_I_xx",
+        "raw_I_xy",
+        "raw_I_xz",
+        "raw_I_yx",
+        "raw_I_yy",
+        "raw_I_yz",
+        "raw_I_zx",
+        "raw_I_zy",
+        "raw_I_zz",
+    ]
+
+    with open(csv_path, "w", newline="", encoding="utf-8") as fp:
+        writer = csv.DictWriter(fp, fieldnames=fieldnames)
+        writer.writeheader()
+        for link_name, vals in results.items():
+            com = np.asarray(vals["com"], dtype=float).reshape(3)
+            inertia = np.asarray(vals["inertia"], dtype=float).reshape(3, 3)
+            raw = vals.get("raw_urdf", {})
+            raw_xyz = np.asarray(raw.get("xyz", np.zeros(3)), dtype=float).reshape(3)
+            raw_rpy = np.asarray(raw.get("rpy", np.zeros(3)), dtype=float).reshape(3)
+            raw_I = np.asarray(raw.get("inertia_matrix_in_inertial", np.zeros((3, 3))), dtype=float).reshape(3, 3)
+
+            writer.writerow(
+                {
+                    "link_name": link_name,
+                    "joint_name": vals.get("joint_name", ""),
+                    "joint_index": vals.get("joint_index", ""),
+                    "mass": float(vals.get("mass", 0.0)),
+                    "inertia_about": vals.get("inertia_about", ""),
+                    "com_x": com[0],
+                    "com_y": com[1],
+                    "com_z": com[2],
+                    "I_xx": inertia[0, 0],
+                    "I_xy": inertia[0, 1],
+                    "I_xz": inertia[0, 2],
+                    "I_yx": inertia[1, 0],
+                    "I_yy": inertia[1, 1],
+                    "I_yz": inertia[1, 2],
+                    "I_zx": inertia[2, 0],
+                    "I_zy": inertia[2, 1],
+                    "I_zz": inertia[2, 2],
+                    "raw_xyz_x": raw_xyz[0],
+                    "raw_xyz_y": raw_xyz[1],
+                    "raw_xyz_z": raw_xyz[2],
+                    "raw_rpy_roll": raw_rpy[0],
+                    "raw_rpy_pitch": raw_rpy[1],
+                    "raw_rpy_yaw": raw_rpy[2],
+                    "raw_I_xx": raw_I[0, 0],
+                    "raw_I_xy": raw_I[0, 1],
+                    "raw_I_xz": raw_I[0, 2],
+                    "raw_I_yx": raw_I[1, 0],
+                    "raw_I_yy": raw_I[1, 1],
+                    "raw_I_yz": raw_I[1, 2],
+                    "raw_I_zx": raw_I[2, 0],
+                    "raw_I_zy": raw_I[2, 1],
+                    "raw_I_zz": raw_I[2, 2],
+                }
+            )
 
 
 def _self_check_identity_case() -> None:

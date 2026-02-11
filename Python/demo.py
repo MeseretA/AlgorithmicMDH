@@ -9,7 +9,7 @@ from URDF2Line import URDF2Line
 from AlgorithmicMDH import AlgorithmicMDH
 from Plotter import Plotter
 from PbSim import PbSim
-from DynamicsMDH import extract_dynamics_in_mdh_frames, get_T_base_mdh_frame
+from DynamicsMDH import extract_dynamics_in_mdh_frames, get_T_base_mdh_frame, save_dynamics_to_csv
 import numpy as np
 
 # you can change urdf_name
@@ -39,7 +39,10 @@ dynamics = extract_dynamics_in_mdh_frames(
     base_link_name=base_link_name,
     inertia_about="com",
 )
+csv_path = "dynamics_in_mdh_frames.csv"
+save_dynamics_to_csv(dynamics, csv_path)
 print("=================DYNAMICS IN MDH FRAMES================")
+print(f"CSV saved: {csv_path}")
 if len(dynamics) == 0:
     print("No <inertial> elements were found for actuated child links.")
 else:

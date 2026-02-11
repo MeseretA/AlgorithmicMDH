@@ -1,2 +1,3 @@
+pip install numpy
 pip install urdfpy
 pip install networkx==2.8.4
